@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
@@ -31,6 +32,13 @@ class TakePictureScreen extends StatefulWidget {
 
 class TakePictureScreenState extends State<TakePictureScreen> {
   final ImagePicker _picker = ImagePicker();
+
+  // Future<ByteData> loadAssetFont() async {
+  //   ByteData imageData = await rootBundle.load('assets/fonts/fonts3.zip');
+
+  //   setState(() {});
+  //   return imageData;
+  // }
 
   Future<String> _getAndEmbedLocation(String imagePath) async {
     bool serviceEnabled;
