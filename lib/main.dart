@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
@@ -16,6 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: true,
       theme: ThemeData.dark(),
       home: const TakePictureScreen(),
     );
@@ -31,6 +35,69 @@ class TakePictureScreen extends StatefulWidget {
 
 class TakePictureScreenState extends State<TakePictureScreen> {
   final ImagePicker _picker = ImagePicker();
+
+  // Load custom font from file
+
+// Function to get the width of the text
+  int getTextWidth(String text, img.BitmapFont font) {
+    log("Address : $text");
+    log(text.length.toString());
+    int width = 0;
+    for (int i = 0; i < text.length; i++) {
+      var ch = text.codeUnitAt(i);
+      var glyph = font.characters[ch];
+      glyph ??= font.characters[48];
+      width += glyph!.width;
+    }
+    return width;
+  }
+
+  void drawStringAtRightCorner(
+      {required img.Image originalImage,
+      required String address,
+      required int yposition,
+      required int? vetewidth}) async {
+    final fontData = await rootBundle.load('assets/fonts/kulimpark3.zip');
+    final font = img.BitmapFont.fromZip(fontData.buffer.asUint8List());
+
+    var textWidth = getTextWidth(address, font);
+
+    // Calculate positions
+    int x = originalImage.width -
+        textWidth -
+        textWidth ~/ 2; // 20 is the right margin
+
+    // 20 is the right margin
+    int y = originalImage.height -
+        font.lineHeight -
+        yposition; // 20 is the bottom margin
+
+    // Draw the string
+    img.drawString(
+      originalImage,
+      address,
+      x: vetewidth ?? x,
+      y: y,
+      font: font,
+    );
+  }
+
+  Future<String> getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        log(place.postalCode.toString());
+        String address = "${place.locality}";
+        return address;
+      } else {
+        return "No address found";
+      }
+    } catch (e) {
+      return "Error: $e";
+    }
+  }
 
   Future<String> _getAndEmbedLocation(String imagePath) async {
     bool serviceEnabled;
@@ -55,40 +122,32 @@ class TakePictureScreenState extends State<TakePictureScreen> {
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
     }
-
-    // _getAddressFromLatLng(Position position) async {
-    //   try {
-    //     List<Placemark> placemarks = await placemarkFromCoordinates(
-    //         position.latitude, position.longitude);
-
-    //     Placemark place = placemarks[0];
-
-    //     setState(() {
-    //       _currentAddress =
-    //           "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
-    //     });
-    //   } catch (e) {
-    //     print(e);
-    //   }
-    // }
-    // Get current location
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+    final address =
+        await getAddressFromLatLng(position.latitude, position.longitude);
     final gpsCoordinates =
         'Lat: ${position.latitude}, Lon: ${position.longitude}';
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-      position.latitude,
-      position.longitude,
-    );
+    var vetewidth = getTextWidth(gpsCoordinates, img.arial48);
 
-    Placemark place = placemarks[0];
     img.Image originalImage =
         img.decodeImage(File(imagePath).readAsBytesSync())!;
-    img.drawString(originalImage, gpsCoordinates,
-        maskChannel: img.Channel.luminance,
-        x: originalImage.width ~/ 1.5,
-        y: originalImage.height - 200,
-        font: img.arial48);
+    int vetex = originalImage.width - vetewidth;
+    drawStringAtRightCorner(
+        originalImage: originalImage,
+        address: address,
+        yposition: 20,
+        vetewidth: null);
+    drawStringAtRightCorner(
+        originalImage: originalImage,
+        address: gpsCoordinates,
+        yposition: 100,
+        vetewidth: null);
+    drawStringAtRightCorner(
+        originalImage: originalImage,
+        address: 'Vety',
+        yposition: 180,
+        vetewidth: vetex);
 
     final directory = await getApplicationDocumentsDirectory();
     final newPath = '${directory.path}/image_with_location.png';
