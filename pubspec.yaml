@@ -66,11 +66,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-<<<<<<< HEAD
     - assets/fonts/
-=======
-    - assets/fonts/fonts.zip
->>>>>>> 2cb0b5c957dd5931cd1166fe61e38995e9ec253a
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
