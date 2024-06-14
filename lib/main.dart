@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
@@ -8,6 +7,9 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:io';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
+import 'dart:typed_data';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       home: const TakePictureScreen(),
     );
@@ -35,67 +37,16 @@ class TakePictureScreen extends StatefulWidget {
 
 class TakePictureScreenState extends State<TakePictureScreen> {
   final ImagePicker _picker = ImagePicker();
+  final List<File?> _images = [null, null, null];
 
-  // Load custom font from file
+  Future<void> _pickImage(int index) async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
 
-// Function to get the width of the text
-  int getTextWidth(String text, img.BitmapFont font) {
-    log("Address : $text");
-    log(text.length.toString());
-    int width = 0;
-    for (int i = 0; i < text.length; i++) {
-      var ch = text.codeUnitAt(i);
-      var glyph = font.characters[ch];
-      glyph ??= font.characters[48];
-      width += glyph!.width;
-    }
-    return width;
-  }
-
-  void drawStringAtRightCorner(
-      {required img.Image originalImage,
-      required String address,
-      required int yposition,
-      required int? vetewidth}) async {
-    final fontData = await rootBundle.load('assets/fonts/kulimpark3.zip');
-    final font = img.BitmapFont.fromZip(fontData.buffer.asUint8List());
-
-    var textWidth = getTextWidth(address, font);
-
-    // Calculate positions
-    int x = originalImage.width -
-        textWidth -
-        textWidth ~/ 2; // 20 is the right margin
-
-    // 20 is the right margin
-    int y = originalImage.height -
-        font.lineHeight -
-        yposition; // 20 is the bottom margin
-
-    // Draw the string
-    img.drawString(
-      originalImage,
-      address,
-      x: vetewidth ?? x,
-      y: y,
-      font: font,
-    );
-  }
-
-  Future<String> getAddressFromLatLng(double lat, double lng) async {
-    try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
-        log(place.postalCode.toString());
-        String address = "${place.locality}";
-        return address;
-      } else {
-        return "No address found";
-      }
-    } catch (e) {
-      return "Error: $e";
+    if (pickedFile != null) {
+      final newPath = await _getAndEmbedLocation(pickedFile.path);
+      setState(() {
+        _images[index] = File(newPath);
+      });
     }
   }
 
@@ -103,13 +54,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Check if location services are enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return Future.error('Location services are disabled.');
     }
 
-    // Check for location permissions
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -150,7 +99,8 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         vetewidth: vetex);
 
     final directory = await getApplicationDocumentsDirectory();
-    final newPath = '${directory.path}/image_with_location.png';
+    final newPath =
+        '${directory.path}/image_with_location_${DateTime.now().millisecondsSinceEpoch}.png';
     File(newPath).writeAsBytesSync(
       img.encodeJpg(
         originalImage,
@@ -160,45 +110,107 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     return newPath;
   }
 
+  Future<String> getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        log(place.postalCode.toString());
+        String address = "${place.locality}";
+        return address;
+      } else {
+        return "No address found";
+      }
+    } catch (e) {
+      return "Error: $e";
+    }
+  }
+
+  int getTextWidth(String text, img.BitmapFont font) {
+    log("Address : $text");
+    log(text.length.toString());
+    int width = 0;
+    for (int i = 0; i < text.length; i++) {
+      var ch = text.codeUnitAt(i);
+      var glyph = font.characters[ch];
+      glyph ??= font.characters[48];
+      width += glyph!.width;
+    }
+    return width;
+  }
+
+  void drawStringAtRightCorner(
+      {required img.Image originalImage,
+      required String address,
+      required int yposition,
+      required int? vetewidth}) async {
+    final fontData = await rootBundle.load('assets/fonts/kulimpark3.zip');
+    final font = img.BitmapFont.fromZip(fontData.buffer.asUint8List());
+
+    var textWidth = getTextWidth(address, font);
+
+    int x = originalImage.width - textWidth - textWidth ~/ 2;
+
+    int y = originalImage.height - font.lineHeight - yposition;
+
+    img.drawString(
+      originalImage,
+      address,
+      x: vetewidth ?? x,
+      y: y,
+      font: font,
+    );
+  }
+
+  Future<void> _saveImagesToGallery() async {
+    // Request storage permissions if not already granted
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      status = await Permission.manageExternalStorage.request();
+    }
+
+    if (status.isGranted) {
+      for (var image in _images) {
+        if (image != null) {
+          final Uint8List bytes = await image.readAsBytes();
+          final result = await ImageGallerySaver.saveImage(bytes);
+          log('Image saved to gallery: $result');
+        }
+      }
+    } else {
+      log('Storage permission not granted');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Take a picture')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () async {
-            final pickedFile =
-                await _picker.pickImage(source: ImageSource.camera);
-
-            if (pickedFile != null) {
-              final newPath = await _getAndEmbedLocation(pickedFile.path);
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      DisplayPictureScreen(imagePath: newPath),
+      body: Column(
+        children: [
+          for (int i = 0; i < 3; i++)
+            GestureDetector(
+              onTap: () => _pickImage(i),
+              child: Container(
+                margin: const EdgeInsets.all(8.0),
+                width: double.infinity,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  border: Border.all(color: Colors.black),
                 ),
-              );
-            }
-          },
-          child: const Text('Take Picture'),
-        ),
+                child: _images[i] == null
+                    ? const Icon(Icons.camera_alt, size: 50)
+                    : Image.file(_images[i]!, fit: BoxFit.cover),
+              ),
+            ),
+          ElevatedButton(
+            onPressed: _saveImagesToGallery,
+            child: const Text('Save to Gallery'),
+          ),
+        ],
       ),
-    );
-  }
-}
-
-class DisplayPictureScreen extends StatelessWidget {
-  final String imagePath;
-
-  const DisplayPictureScreen({super.key, required this.imagePath});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Display the Picture')),
-      body: Image.file(File(imagePath)),
     );
   }
 }
