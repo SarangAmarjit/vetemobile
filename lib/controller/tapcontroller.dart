@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as math;
+import 'package:auto_route/auto_route.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -26,7 +28,7 @@ class GetxTapController extends GetxController {
 
   // GetxTapController({required this.context});
   //table
-
+  InAppWebViewController? webViewController;
   final ImagePicker _picker = ImagePicker();
   List<File?> _capturedimages = [null, null, null];
   List<File?> get capturedimages => _capturedimages;
@@ -106,7 +108,7 @@ class GetxTapController extends GetxController {
         vetewidth: null);
     drawStringAtRightCorner(
         originalImage: originalImage,
-        address: 'Vety',
+        address: 'Vety 1962',
         yposition: 180,
         font: font,
         vetewidth: vetex);
@@ -199,9 +201,45 @@ class GetxTapController extends GetxController {
 
   // Navigation Bar Index Change
 
-  void onItemTapped(int index) {
-    _selectedIndex = index;
+  void onItemTapped(int index, BuildContext context) {
+    if (index == 3) {
+      // If the log out button is pressed
+      showLogoutDialog(context);
+    } else {
+      if (index == 0) {
+        if (_selectedIndex == index) {
+          webViewController?.loadUrl(
+              urlRequest: URLRequest(
+                  url: WebUri('http://vety.cubeten.com/MV/mv_task.aspx')));
+        }
+      }
+
+      log(index.toString());
+      _selectedIndex = index;
+      update();
+    }
+
     update();
+  }
+
+  void showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Log Out'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          ElevatedButton(
+            onPressed: () => context.router.pop(false),
+            child: const Text('No'),
+          ),
+          ElevatedButton(
+            onPressed: () => context.router.replaceNamed('/logout'),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
   }
 
   void resetcapture() {

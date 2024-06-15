@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'KulimPark',
-        useMaterial3: true,
+        useMaterial3: false,
       ),
     );
   }

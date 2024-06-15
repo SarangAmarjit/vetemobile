@@ -8,28 +8,32 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:auto_route/auto_route.dart' as _i3;
-import 'package:flutter/material.dart' as _i4;
-import 'package:geotagcameraapp/pages/navigationpage.dart' as _i2;
-import 'package:geotagcameraapp/pages/webpage.dart' as _i1;
+import 'package:auto_route/auto_route.dart' as _i4;
+import 'package:geotagcameraapp/pages/loginpage.dart' as _i1;
+import 'package:geotagcameraapp/pages/logoutpage.dart' as _i2;
+import 'package:geotagcameraapp/pages/navigationpage.dart' as _i3;
 
-abstract class $AppRouter extends _i3.RootStackRouter {
+abstract class $AppRouter extends _i4.RootStackRouter {
   $AppRouter({super.navigatorKey});
 
   @override
-  final Map<String, _i3.PageFactory> pagesMap = {
+  final Map<String, _i4.PageFactory> pagesMap = {
     LoginPage.name: (routeData) {
-      final args =
-          routeData.argsAs<LoginPageArgs>(orElse: () => const LoginPageArgs());
-      return _i3.AutoRoutePage<dynamic>(
+      return _i4.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: _i1.LoginPage(key: args.key),
+        child: const _i1.LoginPage(),
+      );
+    },
+    LogoutPage.name: (routeData) {
+      return _i4.AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const _i2.LogoutPage(),
       );
     },
     NavBarPage.name: (routeData) {
-      return _i3.AutoRoutePage<dynamic>(
+      return _i4.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i2.NavBarPage(),
+        child: const _i3.NavBarPage(),
       );
     },
   };
@@ -37,37 +41,36 @@ abstract class $AppRouter extends _i3.RootStackRouter {
 
 /// generated route for
 /// [_i1.LoginPage]
-class LoginPage extends _i3.PageRouteInfo<LoginPageArgs> {
-  LoginPage({
-    _i4.Key? key,
-    List<_i3.PageRouteInfo>? children,
-  }) : super(
+class LoginPage extends _i4.PageRouteInfo<void> {
+  const LoginPage({List<_i4.PageRouteInfo>? children})
+      : super(
           LoginPage.name,
-          args: LoginPageArgs(key: key),
           initialChildren: children,
         );
 
   static const String name = 'LoginPage';
 
-  static const _i3.PageInfo<LoginPageArgs> page =
-      _i3.PageInfo<LoginPageArgs>(name);
-}
-
-class LoginPageArgs {
-  const LoginPageArgs({this.key});
-
-  final _i4.Key? key;
-
-  @override
-  String toString() {
-    return 'LoginPageArgs{key: $key}';
-  }
+  static const _i4.PageInfo<void> page = _i4.PageInfo<void>(name);
 }
 
 /// generated route for
-/// [_i2.NavBarPage]
-class NavBarPage extends _i3.PageRouteInfo<void> {
-  const NavBarPage({List<_i3.PageRouteInfo>? children})
+/// [_i2.LogoutPage]
+class LogoutPage extends _i4.PageRouteInfo<void> {
+  const LogoutPage({List<_i4.PageRouteInfo>? children})
+      : super(
+          LogoutPage.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'LogoutPage';
+
+  static const _i4.PageInfo<void> page = _i4.PageInfo<void>(name);
+}
+
+/// generated route for
+/// [_i3.NavBarPage]
+class NavBarPage extends _i4.PageRouteInfo<void> {
+  const NavBarPage({List<_i4.PageRouteInfo>? children})
       : super(
           NavBarPage.name,
           initialChildren: children,
@@ -75,5 +78,5 @@ class NavBarPage extends _i3.PageRouteInfo<void> {
 
   static const String name = 'NavBarPage';
 
-  static const _i3.PageInfo<void> page = _i3.PageInfo<void>(name);
+  static const _i4.PageInfo<void> page = _i4.PageInfo<void>(name);
 }

@@ -2,22 +2,22 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:geotagcameraapp/controller/tapcontroller.dart';
 import 'package:geotagcameraapp/pages/camerapage.dart';
+import 'package:geotagcameraapp/pages/livetracking.dart';
+import 'package:geotagcameraapp/pages/logoutpage.dart';
+
+import 'package:geotagcameraapp/pages/loginpage.dart';
+import 'package:geotagcameraapp/pages/mytaskpage.dart';
 import 'package:get/get.dart';
 
 @RoutePage()
 class NavBarPage extends StatelessWidget {
   const NavBarPage({super.key});
 
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Home Page',
-      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-    ),
-    CameraCapturePage(),
-    Text(
-      'Log Out Page',
-      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-    ),
+  static final List<Widget> _widgetOptions = <Widget>[
+    const MytaskPage(),
+    const LiveTrackingPage(),
+    const CameraCapturePage(),
+    const LogoutPage()
   ];
 
   @override
@@ -25,7 +25,17 @@ class NavBarPage extends StatelessWidget {
     GetxTapController controller = Get.put(GetxTapController());
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Vety App'),
+        backgroundColor: Colors.white,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 15),
+          child: Image.asset(
+            'assets/images/Kanglasha.png',
+          ),
+        ),
+        title: const Text(
+          '1962 - Manipur Mobile Veterinary',
+          style: TextStyle(color: Colors.black),
+        ),
       ),
       body: GetBuilder<GetxTapController>(builder: (_) {
         return Center(
@@ -37,7 +47,11 @@ class NavBarPage extends StatelessWidget {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
-              label: 'Home',
+              label: 'Task List',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.spatial_tracking),
+              label: 'Live Tracking',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.camera_alt_rounded),
@@ -49,9 +63,11 @@ class NavBarPage extends StatelessWidget {
             ),
           ],
           currentIndex: controller.selectedIndex,
-          selectedItemColor: Colors.blue,
+          selectedItemColor: const Color.fromARGB(255, 62, 175, 66),
+          unselectedItemColor: const Color.fromARGB(255, 97, 96, 96),
+          showUnselectedLabels: true,
           onTap: (value) {
-            controller.onItemTapped(value);
+            controller.onItemTapped(value, context);
           },
         );
       }),
