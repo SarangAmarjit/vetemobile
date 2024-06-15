@@ -28,7 +28,7 @@ class GetxTapController extends GetxController {
   //table
 
   final ImagePicker _picker = ImagePicker();
-  final List<File?> _capturedimages = [null, null, null];
+  List<File?> _capturedimages = [null, null, null];
   List<File?> get capturedimages => _capturedimages;
 
   final List<bool> _isimagecapturedbycam = [false, false, false];
@@ -201,6 +201,11 @@ class GetxTapController extends GetxController {
 
   void onItemTapped(int index) {
     _selectedIndex = index;
+    update();
+  }
+
+  void resetcapture() {
+    _capturedimages = [null, null, null];
     update();
   }
 }
