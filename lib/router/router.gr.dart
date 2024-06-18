@@ -21,13 +21,13 @@ abstract class $AppRouter extends _i4.RootStackRouter {
     LoginPage.name: (routeData) {
       return _i4.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i1.LoginPage(),
+        child: _i1.LoginPage(),
       );
     },
     LogoutPage.name: (routeData) {
       return _i4.AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const _i2.LogoutPage(),
+        child: _i2.LogoutPage(),
       );
     },
     NavBarPage.name: (routeData) {

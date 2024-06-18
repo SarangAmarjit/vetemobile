@@ -38,6 +38,35 @@ class GetxTapController extends GetxController {
 
   int _selectedIndex = 0;
   int get selectedIndex => _selectedIndex;
+  bool _isErrorPageDisplayed = false;
+  bool get isErrorPageDisplayed => _isErrorPageDisplayed;
+
+  bool _isLoading = true;
+  bool get isLoading => _isLoading;
+  @override
+  Future<void> onInit() async {
+    super.onInit();
+    Future.delayed(const Duration(seconds: 2))
+        .whenComplete(() => FlutterNativeSplash.remove());
+    log('finish splash');
+  }
+
+  void handleloadingpage({required bool isloadingpage}) {
+    _isLoading = isloadingpage;
+    update();
+  }
+
+  void handlenetworkpage({required bool iserrorpage}) {
+    log('ErrorPage :$iserrorpage');
+    if (iserrorpage) {
+      _isErrorPageDisplayed = iserrorpage;
+      update();
+    } else {
+      _isLoading = true;
+      _isErrorPageDisplayed = iserrorpage;
+      update();
+    }
+  }
 
   Future<void> pickImage(int index) async {
     final pickedFile = await _picker.pickImage(
