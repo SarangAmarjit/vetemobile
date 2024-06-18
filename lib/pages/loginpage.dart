@@ -34,6 +34,7 @@ class LoginPage extends StatelessWidget {
                         var url = navigationAction.request.url.toString();
                         log("onclickbutton $url");
                         if (url == 'http://vety.cubeten.com/MV/mv_task.aspx') {
+                          getcontroller.handleloadingpage(isloadingpage: true);
                           context.router.replaceNamed('/navbar');
                           // Intercept the URL and navigate to a Flutter page instead
                           // Navigator.push(
@@ -53,8 +54,34 @@ class LoginPage extends StatelessWidget {
                         ),
                       ),
                       onWebViewCreated: (controller) {
+                        log('onweb......');
                         getcontroller.handleloadingpage(isloadingpage: true);
                         webViewController = controller;
+                      },
+                      onPageCommitVisible: (controller, url) async {
+                        ByteData fontData =
+                            await rootBundle.load('assets/fonts/KulimPark.ttf');
+                        Uint8List fontBytes = fontData.buffer.asUint8List();
+                        String base64Font = base64.encode(fontBytes);
+                        await controller.injectCSSCode(source: '''
+ @font-face {
+                              font-family: 'KulimPark-Regular';
+                              src: url(data:font/ttf;base64,$base64Font) format('truetype');
+                            }
+                            
+                                                                      .card {
+                                                  font-family: "KulimPark-Regular"; 
+                                                  font-size: 14px; 
+                                            
+                                              }
+                                              .app-main {
+    align-content: center;
+}
+br {
+    display: none;
+}
+
+''');
                       },
                       onLoadStart: (controller, url) {
                         // Load the font file as bytes

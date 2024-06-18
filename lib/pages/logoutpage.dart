@@ -50,8 +50,33 @@ class LogoutPage extends StatelessWidget {
                           'http://vety.cubeten.com/MV/mvlogout.aspx',
                         ),
                       ),
+                      onPageCommitVisible: (controller, url) async {
+                        ByteData fontData =
+                            await rootBundle.load('assets/fonts/KulimPark.ttf');
+                        Uint8List fontBytes = fontData.buffer.asUint8List();
+                        String base64Font = base64.encode(fontBytes);
+                        await controller.injectCSSCode(source: '''
+ @font-face {
+                              font-family: 'KulimPark-Regular';
+                              src: url(data:font/ttf;base64,$base64Font) format('truetype');
+                            }
+                            
+                                                                      .card {
+                                                  font-family: "KulimPark-Regular"; 
+                                                  font-size: 14px; 
+                                            
+                                              }
+                                              .app-main {
+    align-content: center;
+}
+br {
+    display: none;
+}
+''');
+                      },
                       shouldOverrideUrlLoading:
                           (controller, navigationAction) async {
+                        getcontroller.handleloadingpage(isloadingpage: true);
                         var url = navigationAction.request.url.toString();
                         log("onclickbutton $url");
                         if (url == 'http://vety.cubeten.com/MV/mvlogin.aspx') {
@@ -66,7 +91,6 @@ class LogoutPage extends StatelessWidget {
                         return NavigationActionPolicy.ALLOW;
                       },
                       onWebViewCreated: (controller) {
-                        getcontroller.handleloadingpage(isloadingpage: true);
                         webViewController = controller;
                       },
                       onReceivedError: (controller, request, error) {
@@ -75,8 +99,6 @@ class LogoutPage extends StatelessWidget {
                       },
                       onLoadStart: (controller, url) {
                         // Load the font file as bytes
-
-                        getcontroller.handleloadingpage(isloadingpage: true);
 
                         print('Started loading: $url');
                       },

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -23,23 +25,26 @@ class CameraCapturePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Take a picture',
-                        style: TextStyle(fontSize: 22),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          controller.resetcapture();
-                        },
-                        child: const Icon(
-                          Icons.restore,
-                          size: 25,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Take Pictures of injured animal :',
+                          style: TextStyle(fontSize: 22),
                         ),
-                      )
-                    ],
+                        GestureDetector(
+                          onTap: () {
+                            controller.resetcapture();
+                          },
+                          child: const Icon(
+                            Icons.restore,
+                            size: 25,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                   for (int i = 0; i < 3; i++)
                     GestureDetector(
@@ -105,9 +110,10 @@ class CameraCapturePage extends StatelessWidget {
                     height: 10,
                   ),
                   ElevatedButton(
-                    onPressed: controller.capturedimages.contains(null)
-                        ? null
-                        : () {
+                    onPressed: controller.capturedimages
+                            .any((file) => file != null)
+                        ? () {
+                            // ignore: void_checks
                             controller.saveImagesToGallery().whenComplete(() {
                               return ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -115,9 +121,13 @@ class CameraCapturePage extends StatelessWidget {
                                       content: Text(
                                           'Images Downloaded Successfully')));
                             });
-                          },
+                          }
+                        : null,
                     child: const Text('Save to Gallery'),
                   ),
+                  const SizedBox(
+                    height: 50,
+                  )
                 ],
               ),
             ),

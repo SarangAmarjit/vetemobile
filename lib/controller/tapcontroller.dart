@@ -52,7 +52,9 @@ class GetxTapController extends GetxController {
   }
 
   void handleloadingpage({required bool isloadingpage}) {
+    log(isloadingpage.toString());
     _isLoading = isloadingpage;
+
     update();
   }
 
@@ -202,7 +204,7 @@ class GetxTapController extends GetxController {
     );
   }
 
-  Future<void> saveImagesToGallery() async {
+  Future saveImagesToGallery() async {
     // Request storage permissions if not already granted
     var status = await Permission.storage.status;
     if (!status.isGranted) {
@@ -263,7 +265,11 @@ class GetxTapController extends GetxController {
             child: const Text('No'),
           ),
           ElevatedButton(
-            onPressed: () => context.router.replaceNamed('/logout'),
+            onPressed: () {
+              _isLoading = true;
+              update();
+              context.router.replaceNamed('/logout');
+            },
             child: const Text('Yes'),
           ),
         ],

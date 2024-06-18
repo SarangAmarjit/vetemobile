@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,14 @@ class MytaskPage extends StatelessWidget {
                     log('close');
                     Navigator.of(context).pop();
                   },
-                  initialSettings: InAppWebViewSettings(supportZoom: false),
+                  initialSettings: InAppWebViewSettings(
+                    supportZoom: false,
+                    javaScriptEnabled: true,
+                    useHybridComposition: true,
+                  ),
+                  onWindowFocus: (controller) {
+                    getcontroller.handleloadingpage(isloadingpage: true);
+                  },
                   initialUrlRequest: URLRequest(
                     url: WebUri(
                       forceToStringRawValue: true,
@@ -50,9 +58,15 @@ class MytaskPage extends StatelessWidget {
                     ),
                   ),
                   onWebViewCreated: (controller) {
-                    getcontroller.handleloadingpage(isloadingpage: true);
                     getcontroller.webViewController = controller;
+                    controller.addJavaScriptHandler(
+                        handlerName: 'buttonClicked',
+                        callback: (args) {
+                          getcontroller.handleloadingpage(isloadingpage: true);
+                          return;
+                        });
                   },
+
                   onReceivedError: (controller, request, error) {
                     getcontroller.handlenetworkpage(iserrorpage: true);
                   },
@@ -63,11 +77,33 @@ class MytaskPage extends StatelessWidget {
 
                     print('Started loading: $url');
                   },
+                  onPageCommitVisible: (controller, url) async {
+                    ByteData fontData =
+                        await rootBundle.load('assets/fonts/KulimPark.ttf');
+                    Uint8List fontBytes = fontData.buffer.asUint8List();
+                    String base64Font = base64.encode(fontBytes);
+                    await controller.injectCSSCode(source: '''
+ @font-face {
+                              font-family: 'KulimPark-Regular';
+                              src: url(data:font/ttf;base64,$base64Font) format('truetype');
+                            }
+                            
+                                                                      .card {
+                                                  font-family: "KulimPark-Regular"; 
+                                                  font-size: 14px; 
+                                              }
+.nav-container {
+    padding-left: 0px;
+}
+
+''');
+                  },
                   onLoadStop: (controller, url) async {
                     getcontroller.handleloadingpage(isloadingpage: false);
                   },
                   shouldOverrideUrlLoading:
                       (controller, navigationAction) async {
+                    getcontroller.handleloadingpage(isloadingpage: true);
                     var url = navigationAction.request.url.toString();
 
                     if (url == 'http://vety.cubeten.com/MV/mvlogout.aspx') {
