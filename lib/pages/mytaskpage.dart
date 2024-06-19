@@ -7,6 +7,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:geotagcameraapp/controller/tapcontroller.dart';
 import 'package:geotagcameraapp/pages/networkerrorpage.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 @RoutePage()
 class MytaskPage extends StatelessWidget {
@@ -49,9 +50,11 @@ class MytaskPage extends StatelessWidget {
                     javaScriptEnabled: true,
                     useHybridComposition: true,
                   ),
-                  onWindowFocus: (controller) {
-                    getcontroller.handleloadingpage(isloadingpage: true);
-                  },
+                  // onPageCommitVisible: (controller, url) async {
+                  //   if (url.toString().contains('tel')) {
+                  //     await launch(url.toString());
+                  //   }
+                  // },
                   initialUrlRequest: URLRequest(
                     url: WebUri(
                       forceToStringRawValue: true,
@@ -60,16 +63,14 @@ class MytaskPage extends StatelessWidget {
                   ),
                   onWebViewCreated: (controller) {
                     getcontroller.webViewController = controller;
-                    controller.addJavaScriptHandler(
-                        handlerName: 'buttonClicked',
-                        callback: (args) {
-                          getcontroller.handleloadingpage(isloadingpage: true);
-                          return;
-                        });
                   },
 
                   onReceivedError: (controller, request, error) {
-                    getcontroller.handlenetworkpage(iserrorpage: true);
+                    if (request.url.scheme == "tel") {
+                      log('phon call');
+                    } else {
+                      getcontroller.handlenetworkpage(iserrorpage: true);
+                    }
                   },
                   onLoadStart: (controller, url) {
                     // Load the font file as bytes
@@ -89,34 +90,38 @@ class MytaskPage extends StatelessWidget {
 
                     print('Started loading: $url');
                   },
-                  onPageCommitVisible: (controller, url) async {
-                    ByteData fontData =
-                        await rootBundle.load('assets/fonts/KulimPark.ttf');
-                    Uint8List fontBytes = fontData.buffer.asUint8List();
-                    String base64Font = base64.encode(fontBytes);
-                    await controller.injectCSSCode(source: '''
- @font-face {
-                              font-family: 'KulimPark-Regular';
-                              src: url(data:font/ttf;base64,$base64Font) format('truetype');
-                            }
-                            
-                                                                      .card {
-                                                  font-family: "KulimPark-Regular"; 
-                                                  font-size: 14px; 
-                                              }
-.nav-container {
-    padding-left: 0px;
-}
+//                   onPageCommitVisible: (controller, url) async {
+//                     ByteData fontData =
+//                         await rootBundle.load('assets/fonts/KulimPark.ttf');
+//                     Uint8List fontBytes = fontData.buffer.asUint8List();
+//                     String base64Font = base64.encode(fontBytes);
+//                     await controller.injectCSSCode(source: '''
+//  @font-face {
+//                               font-family: 'KulimPark-Regular';
+//                               src: url(data:font/ttf;base64,$base64Font) format('truetype');
+//                             }
 
-''');
-                  },
+//                                                                       .card {
+//                                                   font-family: "KulimPark-Regular";
+//                                                   font-size: 14px;
+//                                               }
+// .nav-container {
+//     padding-left: 0px;
+// }
+
+// ''');
+//                   },
                   onLoadStop: (controller, url) async {
                     getcontroller.handleloadingpage(isloadingpage: false);
                   },
                   shouldOverrideUrlLoading:
                       (controller, navigationAction) async {
-                    getcontroller.handleloadingpage(isloadingpage: true);
                     var url = navigationAction.request.url.toString();
+                    var uri = navigationAction.request.url;
+                    if (uri != null && uri.scheme == "tel") {
+                      await launch(uri.toString());
+                      return NavigationActionPolicy.CANCEL;
+                    }
 
                     if (url == 'http://vety.cubeten.com/MV/mvlogout.aspx') {
                       context.router.replaceNamed('/logout');

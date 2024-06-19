@@ -35,9 +35,6 @@ class LiveTrackingPage extends StatelessWidget {
                     'http://vety.cubeten.com/MV/ViewAll_Vehicle.html',
                   ),
                 ),
-                onWindowFocus: (controller) {
-                  getcontroller.handleloadingpage(isloadingpage: true);
-                },
                 onWebViewCreated: (controller) {
                   webViewController = controller;
                 },

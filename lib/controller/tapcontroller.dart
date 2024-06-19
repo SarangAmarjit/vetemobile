@@ -54,15 +54,15 @@ class GetxTapController extends GetxController {
     log('finish splash');
   }
 
-  void handleinitialpage({required bool iscomingnavbar}) {
-    _iscomingfromnavbar = iscomingnavbar;
-    update();
-  }
-
   void handleloadingpage({required bool isloadingpage}) {
     log(isloadingpage.toString());
     _isLoading = isloadingpage;
 
+    update();
+  }
+
+  void handleinitialpage({required bool iscomingnavbar}) {
+    _iscomingfromnavbar = iscomingnavbar;
     update();
   }
 
@@ -136,19 +136,19 @@ class GetxTapController extends GetxController {
     drawStringAtRightCorner(
         originalImage: originalImage,
         address: address,
-        yposition: 20,
+        yposition: 100,
         vetewidth: null,
         font: font);
     drawStringAtRightCorner(
         originalImage: originalImage,
         address: gpsCoordinates,
-        yposition: 100,
+        yposition: 180,
         font: font,
         vetewidth: null);
     drawStringAtRightCorner(
         originalImage: originalImage,
-        address: 'Vety 1962',
-        yposition: 180,
+        address: 'MVU 1962',
+        yposition: 260,
         font: font,
         vetewidth: vetex);
 
@@ -228,7 +228,9 @@ class GetxTapController extends GetxController {
       for (var image in _capturedimages) {
         if (image != null) {
           final Uint8List bytes = await image.readAsBytes();
-          final result = await ImageGallerySaver.saveImage(bytes);
+          final result = await ImageGallerySaver.saveImage(
+            bytes,
+          );
 
           log('Image saved to gallery: $result');
         }
