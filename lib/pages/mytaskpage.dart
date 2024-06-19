@@ -8,6 +8,7 @@ import 'package:geotagcameraapp/controller/tapcontroller.dart';
 import 'package:geotagcameraapp/pages/networkerrorpage.dart';
 import 'package:get/get.dart';
 
+@RoutePage()
 class MytaskPage extends StatelessWidget {
   const MytaskPage({super.key});
 
@@ -74,6 +75,17 @@ class MytaskPage extends StatelessWidget {
                     // Load the font file as bytes
 
                     getcontroller.handleloadingpage(isloadingpage: true);
+                    if (getcontroller.iscomingfromnavbar) {
+                      log('ok donnnnnnn');
+                    } else {
+                      if (url.toString() ==
+                          'http://vety.cubeten.com/MV/mvlogin.aspx') {
+                        context.router.replaceNamed('/login');
+                      } else {
+                        context.router.replaceNamed('/navbar');
+                        getcontroller.handleinitialpage(iscomingnavbar: true);
+                      }
+                    }
 
                     print('Started loading: $url');
                   },

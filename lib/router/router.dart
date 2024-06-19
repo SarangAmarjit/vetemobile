@@ -10,7 +10,7 @@ class AppRouter extends $AppRouter {
         //of the replaceInRouteName property
         AutoRoute(
           initial: true,
-          path: '/',
+          path: '/login',
           page: LoginPage.page,
         ),
         AutoRoute(
@@ -20,6 +20,11 @@ class AppRouter extends $AppRouter {
         AutoRoute(
           path: '/logout',
           page: LogoutPage.page,
+        ),
+
+        AutoRoute(
+          path: '/',
+          page: MytaskPage.page,
         ),
       ];
 }

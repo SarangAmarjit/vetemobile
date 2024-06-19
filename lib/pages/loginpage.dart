@@ -70,16 +70,21 @@ class LoginPage extends StatelessWidget {
                             }
                             
                                                                       .card {
-                                                  font-family: "KulimPark-Regular"; 
-                                                  font-size: 14px; 
-                                            
+                                                                      font-family: "KulimPark-Regular"; 
+                                                                      font-size: 14px;
+                                                                      }
+
+                                                                       .app-main {
+                                              align-content: center;
                                               }
-                                              .app-main {
-    align-content: center;
-}
-br {
+                                              br {
     display: none;
 }
+                                                   
+                                            
+                                              
+                                             
+
 
 ''');
                       },

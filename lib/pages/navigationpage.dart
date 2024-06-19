@@ -15,7 +15,7 @@ class NavBarPage extends StatelessWidget {
   const NavBarPage({super.key});
 
   static final List<Widget> _widgetOptions = <Widget>[
-    MytaskPage(),
+    const MytaskPage(),
     LiveTrackingPage(),
     const CameraCapturePage(),
     LogoutPage()

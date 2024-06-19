@@ -43,12 +43,20 @@ class GetxTapController extends GetxController {
 
   bool _isLoading = true;
   bool get isLoading => _isLoading;
+
+  bool _iscomingfromnavbar = false;
+  bool get iscomingfromnavbar => _iscomingfromnavbar;
   @override
   Future<void> onInit() async {
     super.onInit();
     Future.delayed(const Duration(seconds: 2))
         .whenComplete(() => FlutterNativeSplash.remove());
     log('finish splash');
+  }
+
+  void handleinitialpage({required bool iscomingnavbar}) {
+    _iscomingfromnavbar = iscomingnavbar;
+    update();
   }
 
   void handleloadingpage({required bool isloadingpage}) {
