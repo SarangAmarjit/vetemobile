@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:auto_route/auto_route.dart';
+import 'package:exif/exif.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:image/image.dart' as img;
@@ -13,7 +14,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
-
+import 'package:native_exif/native_exif.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:get/get.dart';
@@ -120,6 +121,23 @@ class GetxTapController extends GetxController {
     }
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+    try {
+      var exif = await Exif.fromPath(imagePath);
+      // Read existing EXIF data
+
+      await exif.writeAttributes({
+        'GPSLatitude': position.latitude,
+        'GPSLatitudeRef': 'N',
+        'GPSLongitude': '2.0',
+        'GPSLongitudeRef': position.longitude,
+      });
+      // Save changes to the image file
+      await exif.close(); // Ensure changes are saved
+      // Add GPS data
+    } catch (e) {
+      print('Error writing EXIF data: $e');
+    }
+
     final address =
         await getAddressFromLatLng(position.latitude, position.longitude);
     final gpsCoordinates =

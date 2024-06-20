@@ -49,6 +49,8 @@ dependencies:
   flutter_inappwebview: ^6.0.0
   auto_route: ^7.8.4
   url_launcher: ^6.3.0
+  exif: ^3.3.0
+  native_exif: ^0.6.0
 
 
 flutter_icons:
