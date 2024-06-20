@@ -80,8 +80,8 @@ class GetxTapController extends GetxController {
 
   Future<void> pickImage(int index) async {
     final pickedFile = await _picker.pickImage(
-        source: ImageSource.camera,
         imageQuality: 30,
+        source: ImageSource.camera,
         maxHeight: 2304,
         maxWidth: 1300);
 
@@ -156,7 +156,9 @@ class GetxTapController extends GetxController {
     final newPath =
         '${directory.path}/image_with_location_${DateTime.now().millisecondsSinceEpoch}.jpg';
     File(newPath).writeAsBytesSync(
-      img.encodeJpg(originalImage, quality: 20, chroma: img.JpegChroma.yuv420),
+      img.encodeJpg(
+        originalImage,
+      ),
     );
     return newPath;
   }
@@ -229,6 +231,7 @@ class GetxTapController extends GetxController {
         if (image != null) {
           final Uint8List bytes = await image.readAsBytes();
           final result = await ImageGallerySaver.saveImage(
+            quality: 100,
             bytes,
           );
 
