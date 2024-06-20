@@ -1,16 +1,86 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter/services.dart';
-
 import 'package:geotagcameraapp/controller/tapcontroller.dart';
 import 'package:geotagcameraapp/widget/imageviewfull.dart';
 import 'package:get/get.dart';
 
-class CameraCapturePage extends StatelessWidget {
+class CameraCapturePage extends StatefulWidget {
   const CameraCapturePage({super.key});
+
+  @override
+  State<CameraCapturePage> createState() => _CameraCapturePageState();
+}
+
+class _CameraCapturePageState extends State<CameraCapturePage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showInstructions();
+    });
+  }
+
+  void showInstructions() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'How to Use',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  '1. Accept Permissions:',
+                  style: TextStyle(
+                      color: Colors.blue, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                    '   - Ensure that you accept the storage and GPS permissions when prompted.'),
+                SizedBox(height: 15),
+                Text(
+                  '2. Capture Images:',
+                  style: TextStyle(
+                      color: Colors.blue, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                    '   - You can capture one or more images as per your requirement.'),
+                Text(
+                    '   - After captured, tap on it to view it in full screen.'),
+                SizedBox(height: 15),
+                Text(
+                  '3. Save Images to Gallery:',
+                  style: TextStyle(
+                      color: Colors.blue, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                    '   - Once you have captured at least one image, tap on the "Save to Gallery" button.'),
+                SizedBox(height: 15),
+                Text(
+                  '4. Upload Images:',
+                  style: TextStyle(
+                      color: Colors.blue, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                    '   - After saving, you should upload these images when submitting your report in the "Submit Report" section.'),
+                SizedBox(height: 10),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,15 +104,19 @@ class CameraCapturePage extends StatelessWidget {
                           'Take Pictures of injured animal :',
                           style: TextStyle(fontSize: 22),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            controller.resetcapture();
-                          },
-                          child: const Icon(
-                            Icons.restore,
-                            size: 25,
-                          ),
-                        )
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                controller.resetcapture();
+                              },
+                              child: const Icon(
+                                Icons.restore,
+                                size: 25,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
@@ -113,7 +187,6 @@ class CameraCapturePage extends StatelessWidget {
                     onPressed: controller.capturedimages
                             .any((file) => file != null)
                         ? () {
-                            // ignore: void_checks
                             controller.saveImagesToGallery().whenComplete(() {
                               return ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

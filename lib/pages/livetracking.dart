@@ -32,7 +32,7 @@ class LiveTrackingPage extends StatelessWidget {
                 initialUrlRequest: URLRequest(
                   url: WebUri(
                     forceToStringRawValue: true,
-                    'http://vety.cubeten.com/MV/ViewAll_Vehicle.html',
+                    'http://vety.cubeten.com/MV/mv_v_viewall.aspx',
                   ),
                 ),
                 onWebViewCreated: (controller) {
