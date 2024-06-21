@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:math' as math;
 import 'package:auto_route/auto_route.dart';
-import 'package:exif/exif.dart';
+
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:image/image.dart' as img;
