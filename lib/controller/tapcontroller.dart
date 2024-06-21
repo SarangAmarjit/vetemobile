@@ -127,24 +127,6 @@ class GetxTapController extends GetxController {
     }
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    try {
-      var exif = await Exif.fromPath(imagePath);
-
-      // Read existing EXIF data
-
-      await exif.writeAttributes({
-        'GPSLatitude': position.latitude.toString(),
-        'GPSLatitudeRef': 'N',
-        'GPSLongitude': '2.0',
-        'GPSLongitudeRef': position.longitude.toString(),
-      });
-      // Save changes to the image file
-
-      await exif.close(); // Ensure changes are saved
-      // Add GPS data
-    } catch (e) {
-      print('Error writing EXIF data: $e');
-    }
 
     final address =
         await getAddressFromLatLng(position.latitude, position.longitude);
@@ -190,33 +172,45 @@ class GetxTapController extends GetxController {
         originalImage,
       ),
     );
+
     var exif = await Exif.fromPath(newPath);
-    var imagedata = await exif.getAttributes();
-    log(imagedata.toString());
+    // Convert coordinates to DMS format
+    // Convert coordinates to DMS format
+
+    // Determine latitude and longitude reference
+    String latitudeRef = position.latitude >= 0 ? 'N' : 'S';
+    String longitudeRef = position.longitude >= 0 ? 'E' : 'W';
+
+    // Read existing EXIF data
+
+    // Write EXIF data
+    // Write EXIF data
+    await exif.writeAttributes({
+      'GPSLatitude': position.latitude,
+      'GPSLatitudeRef': latitudeRef,
+      'GPSLongitude': position.longitude,
+      'GPSLongitudeRef': longitudeRef,
+    });
+    // Save changes to the image file
+
+    var imagedata1 = await exif.getAttributes();
+    log('After DECODE IMAGE :$imagedata1');
+
+    await exif.close(); // Ensure changes are saved
+    // Add GPS data
 
     return newPath;
   }
 
-  double? gpsValuesToFloat(IfdValues? values) {
-    if (values == null || values is! IfdRatios) {
-      return null;
-    }
-
-    double sum = 0.0;
-    double unit = 1.0;
-
-    for (final v in values.ratios) {
-      sum += v.toDouble() * unit;
-      unit /= 60.0;
-    }
-
-    return sum;
-  }
-
-  Future main(List<String> arguments) async {
-    for (final filename in arguments) {
-      print("read $filename ..");
-    }
+  List<int> convertToDMS(double coordinate) {
+    coordinate = coordinate.abs();
+    int degrees = coordinate.floor();
+    double minutesFloat = (coordinate - degrees) * 60;
+    int minutes = minutesFloat.floor();
+    double seconds = (minutesFloat - minutes) *
+        60 *
+        10000; // scale seconds to avoid floating point
+    return [degrees, minutes, seconds.round()];
   }
 
   Future<String> getAddressFromLatLng(double lat, double lng) async {
@@ -284,13 +278,13 @@ class GetxTapController extends GetxController {
 
     if (status.isGranted) {
       for (var items in _capturedimages) {
-        final Uint8List bytes = await items['image'].readAsBytes();
-        final result = await ImageGallerySaver.saveImage(
-          quality: 100,
-          bytes,
-        );
+        if (items['image'] != null) {
+          File imagefile = items['image'];
 
-        log('Image saved to gallery: $result');
+          final result = await ImageGallerySaver.saveFile(imagefile.path);
+
+          log('Image saved to gallery: $result');
+        }
       }
     } else {
       log('Storage permission not granted');
