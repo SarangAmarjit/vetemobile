@@ -31,8 +31,12 @@ class GetxTapController extends GetxController {
   //table
   InAppWebViewController? webViewController;
   final ImagePicker _picker = ImagePicker();
-  List<File?> _capturedimages = [null, null, null];
-  List<File?> get capturedimages => _capturedimages;
+  List<Map<String, dynamic>> _capturedimages = [
+    {"image": null, "location": ''},
+    {"image": null, "location": ''},
+    {"image": null, "location": ''}
+  ];
+  List<Map<String, dynamic>> get capturedimages => _capturedimages;
 
   final List<bool> _isimagecapturedbycam = [false, false, false];
   List<bool> get isimagecapturedbycam => _isimagecapturedbycam;
@@ -90,15 +94,17 @@ class GetxTapController extends GetxController {
       _isimagecapturedbycam[index] = true;
       update();
 
-      await _getAndEmbedLocation(pickedFile.path).then((newPath) {
+      await _getAndEmbedLocation(imagePath: pickedFile.path, index: index)
+          .then((newPath) {
         _isimagecapturedbycam[index] = false;
-        _capturedimages[index] = File(newPath);
+        _capturedimages[index]['image'] = File(newPath);
         update();
       });
     }
   }
 
-  Future<String> _getAndEmbedLocation(String imagePath) async {
+  Future<String> _getAndEmbedLocation(
+      {required String imagePath, required int index}) async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -123,15 +129,17 @@ class GetxTapController extends GetxController {
         desiredAccuracy: LocationAccuracy.high);
     try {
       var exif = await Exif.fromPath(imagePath);
+
       // Read existing EXIF data
 
       await exif.writeAttributes({
-        'GPSLatitude': position.latitude,
+        'GPSLatitude': position.latitude.toString(),
         'GPSLatitudeRef': 'N',
         'GPSLongitude': '2.0',
-        'GPSLongitudeRef': position.longitude,
+        'GPSLongitudeRef': position.longitude.toString(),
       });
       // Save changes to the image file
+
       await exif.close(); // Ensure changes are saved
       // Add GPS data
     } catch (e) {
@@ -142,6 +150,10 @@ class GetxTapController extends GetxController {
         await getAddressFromLatLng(position.latitude, position.longitude);
     final gpsCoordinates =
         'Lat: ${position.latitude}, Lon: ${position.longitude}';
+
+    _capturedimages[index]['location'] = gpsCoordinates;
+    update();
+
     // final fontData = await rootBundle.load('assets/fonts/kulimpark3.zip');
     // final font = img.BitmapFont.fromZip(fontData.buffer.asUint8List());
     final font = img.arial48;
@@ -178,7 +190,33 @@ class GetxTapController extends GetxController {
         originalImage,
       ),
     );
+    var exif = await Exif.fromPath(newPath);
+    var imagedata = await exif.getAttributes();
+    log(imagedata.toString());
+
     return newPath;
+  }
+
+  double? gpsValuesToFloat(IfdValues? values) {
+    if (values == null || values is! IfdRatios) {
+      return null;
+    }
+
+    double sum = 0.0;
+    double unit = 1.0;
+
+    for (final v in values.ratios) {
+      sum += v.toDouble() * unit;
+      unit /= 60.0;
+    }
+
+    return sum;
+  }
+
+  Future main(List<String> arguments) async {
+    for (final filename in arguments) {
+      print("read $filename ..");
+    }
   }
 
   Future<String> getAddressFromLatLng(double lat, double lng) async {
@@ -245,16 +283,14 @@ class GetxTapController extends GetxController {
     }
 
     if (status.isGranted) {
-      for (var image in _capturedimages) {
-        if (image != null) {
-          final Uint8List bytes = await image.readAsBytes();
-          final result = await ImageGallerySaver.saveImage(
-            quality: 100,
-            bytes,
-          );
+      for (var items in _capturedimages) {
+        final Uint8List bytes = await items['image'].readAsBytes();
+        final result = await ImageGallerySaver.saveImage(
+          quality: 100,
+          bytes,
+        );
 
-          log('Image saved to gallery: $result');
-        }
+        log('Image saved to gallery: $result');
       }
     } else {
       log('Storage permission not granted');
@@ -309,7 +345,11 @@ class GetxTapController extends GetxController {
   }
 
   void resetcapture() {
-    _capturedimages = [null, null, null];
+    _capturedimages = [
+      {"image": null, "location": ''},
+      {"image": null, "location": ''},
+      {"image": null, "location": ''}
+    ];
     update();
   }
 }
