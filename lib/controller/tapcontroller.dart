@@ -149,7 +149,7 @@ class GetxTapController extends GetxController {
         originalImage: originalImage,
         address: address,
         yposition: 100,
-        vetewidth: null,
+        vetewidth: address.length < 10 ? vetex : null,
         font: font);
     drawStringAtRightCorner(
         originalImage: originalImage,
@@ -219,6 +219,7 @@ class GetxTapController extends GetxController {
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
+        log('Full Address : $place');
         log(place.postalCode.toString());
         String address = "${place.locality}";
         return address;
