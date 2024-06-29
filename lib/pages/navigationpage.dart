@@ -37,7 +37,7 @@ class NavBarPage extends StatelessWidget {
                   ),
                 ),
                 title: const Text(
-                  '1962 - Manipur Mobile Veterinary',
+                  'MOBILE VETERINARY UNIT',
                   style: TextStyle(color: Colors.black),
                 ),
               ),
