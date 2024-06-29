@@ -304,7 +304,7 @@ class GetxTapController extends GetxController {
         if (_selectedIndex == index) {
           webViewController?.loadUrl(
               urlRequest: URLRequest(
-                  url: WebUri('http://vety.cubeten.com/MV/mv_task.aspx')));
+                  url: WebUri('http://vetymanipur.in/MV/mv_task.aspx')));
         }
       }
 

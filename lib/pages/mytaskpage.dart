@@ -58,7 +58,7 @@ class MytaskPage extends StatelessWidget {
                   initialUrlRequest: URLRequest(
                     url: WebUri(
                       forceToStringRawValue: true,
-                      'http://vety.cubeten.com/MV/mv_task.aspx',
+                      'http://vetymanipur.in/MV/mv_task.aspx',
                     ),
                   ),
                   onWebViewCreated: (controller) {
@@ -80,7 +80,7 @@ class MytaskPage extends StatelessWidget {
                       log('ok donnnnnnn');
                     } else {
                       if (url.toString() ==
-                          'http://vety.cubeten.com/MV/mvlogin.aspx') {
+                          'http://vetymanipur.in/MV/mvlogin.aspx') {
                         context.router.replaceNamed('/login');
                       } else {
                         context.router.replaceNamed('/navbar');
@@ -123,7 +123,7 @@ class MytaskPage extends StatelessWidget {
                       return NavigationActionPolicy.CANCEL;
                     }
 
-                    if (url == 'http://vety.cubeten.com/MV/mvlogout.aspx') {
+                    if (url == 'http://vetymanipur.in/MV/mvlogout.aspx') {
                       context.router.replaceNamed('/logout');
                       // Intercept the URL and navigate to a Flutter page instead
                       // Navigator.push(

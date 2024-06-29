@@ -34,7 +34,7 @@ class LogoutPage extends StatelessWidget {
                       // shouldOverrideUrlLoading: (controller, navigationAction) async {
                       //   var url = navigationAction.request.url.toString();
                       //   log("onclickbutton $url");
-                      //   if (url == 'http://vety.cubeten.com/MV/mv_task.aspx') {
+                      //   if (url == 'http://vetymanipur.in/MV/mv_task.aspx') {
                       //     context.router.replaceNamed('/navbar');
                       //     // Intercept the URL and navigate to a Flutter page instead
                       //     // Navigator.push(
@@ -47,7 +47,7 @@ class LogoutPage extends StatelessWidget {
                       // },
                       initialUrlRequest: URLRequest(
                         url: WebUri(
-                          'http://vety.cubeten.com/MV/mvlogout.aspx',
+                          'http://vetymanipur.in/MV/mvlogout.aspx',
                         ),
                       ),
 //                       onPageCommitVisible: (controller, url) async {
@@ -79,7 +79,7 @@ class LogoutPage extends StatelessWidget {
                         getcontroller.handleloadingpage(isloadingpage: true);
                         var url = navigationAction.request.url.toString();
                         log("onclickbutton $url");
-                        if (url == 'http://vety.cubeten.com/MV/mvlogin.aspx') {
+                        if (url == 'http://vetymanipur.in/MV/mvlogin.aspx') {
                           context.router.replaceNamed('/login');
                           // Intercept the URL and navigate to a Flutter page instead
                           // Navigator.push(
