@@ -32,14 +32,11 @@ class LiveTrackingPage extends StatelessWidget {
                 initialUrlRequest: URLRequest(
                   url: WebUri(
                     forceToStringRawValue: true,
-                    'http://vetymanipur.in/MV/mv_v_viewall.aspx',
+                    'https://vetymanipur.in/MV/mv_v_viewall.aspx',
                   ),
                 ),
                 onWebViewCreated: (controller) {
                   webViewController = controller;
-                },
-                onReceivedError: (controller, request, error) {
-                  getcontroller.handlenetworkpage(iserrorpage: true);
                 },
                 onLoadStart: (controller, url) {
                   // Load the font file as bytes

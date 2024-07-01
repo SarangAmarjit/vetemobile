@@ -33,7 +33,7 @@ class LoginPage extends StatelessWidget {
                           (controller, navigationAction) async {
                         var url = navigationAction.request.url.toString();
                         log("onclickbutton $url");
-                        if (url == 'http://vetymanipur.in/MV/mv_task.aspx') {
+                        if (url == 'https://vetymanipur.in/MV/mv_task.aspx') {
                           getcontroller.handleloadingpage(isloadingpage: true);
                           context.router.replaceNamed('/navbar');
                           // Intercept the URL and navigate to a Flutter page instead
@@ -50,7 +50,7 @@ class LoginPage extends StatelessWidget {
                       },
                       initialUrlRequest: URLRequest(
                         url: WebUri(
-                          'http://vetymanipur.in/MV/mvlogin.aspx',
+                          'https://vetymanipur.in/MV/mvlogin.aspx',
                         ),
                       ),
                       onWebViewCreated: (controller) {

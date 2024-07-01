@@ -35,11 +35,6 @@ class MytaskPage extends StatelessWidget {
             child: Stack(
               children: [
                 InAppWebView(
-                  // initialOptions: InAppWebViewGroupOptions(
-                  //   crossPlatform: InAppWebViewOptions(
-                  //     supportZoom: false,
-                  //   ),
-                  // ),
                   preventGestureDelay: true,
                   onCloseWindow: (controller) {
                     log('close');
@@ -50,37 +45,22 @@ class MytaskPage extends StatelessWidget {
                     javaScriptEnabled: true,
                     useHybridComposition: true,
                   ),
-                  // onPageCommitVisible: (controller, url) async {
-                  //   if (url.toString().contains('tel')) {
-                  //     await launch(url.toString());
-                  //   }
-                  // },
                   initialUrlRequest: URLRequest(
                     url: WebUri(
                       forceToStringRawValue: true,
-                      'http://vetymanipur.in/MV/mv_task.aspx',
+                      'https://vetymanipur.in/MV/mv_task.aspx',
                     ),
                   ),
                   onWebViewCreated: (controller) {
                     getcontroller.webViewController = controller;
                   },
-
-                  onReceivedError: (controller, request, error) {
-                    if (request.url.scheme == "tel") {
-                      log('phon call');
-                    } else {
-                      getcontroller.handlenetworkpage(iserrorpage: true);
-                    }
-                  },
                   onLoadStart: (controller, url) {
-                    // Load the font file as bytes
-
                     getcontroller.handleloadingpage(isloadingpage: true);
                     if (getcontroller.iscomingfromnavbar) {
                       log('ok donnnnnnn');
                     } else {
                       if (url.toString() ==
-                          'http://vetymanipur.in/MV/mvlogin.aspx') {
+                          'https://vetymanipur.in/MV/mvlogin.aspx') {
                         context.router.replaceNamed('/login');
                       } else {
                         context.router.replaceNamed('/navbar');
@@ -90,29 +70,14 @@ class MytaskPage extends StatelessWidget {
 
                     print('Started loading: $url');
                   },
-//                   onPageCommitVisible: (controller, url) async {
-//                     ByteData fontData =
-//                         await rootBundle.load('assets/fonts/KulimPark.ttf');
-//                     Uint8List fontBytes = fontData.buffer.asUint8List();
-//                     String base64Font = base64.encode(fontBytes);
-//                     await controller.injectCSSCode(source: '''
-//  @font-face {
-//                               font-family: 'KulimPark-Regular';
-//                               src: url(data:font/ttf;base64,$base64Font) format('truetype');
-//                             }
-
-//                                                                       .card {
-//                                                   font-family: "KulimPark-Regular";
-//                                                   font-size: 14px;
-//                                               }
-// .nav-container {
-//     padding-left: 0px;
-// }
-
-// ''');
-//                   },
                   onLoadStop: (controller, url) async {
                     getcontroller.handleloadingpage(isloadingpage: false);
+
+                    var elementValue = await controller.evaluateJavascript(
+                        source:
+                            "window.document.getElementById('ctl00_lbl_MVUno').innerText");
+                    getcontroller.setusername(name: elementValue);
+                    print('Value iddddd :$elementValue');
                   },
                   shouldOverrideUrlLoading:
                       (controller, navigationAction) async {
@@ -123,18 +88,13 @@ class MytaskPage extends StatelessWidget {
                       return NavigationActionPolicy.CANCEL;
                     }
 
-                    if (url == 'http://vetymanipur.in/MV/mvlogout.aspx') {
+                    if (url == 'https://vetymanipur.in/MV/mvlogout.aspx') {
                       context.router.replaceNamed('/logout');
-                      // Intercept the URL and navigate to a Flutter page instead
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => const FlutterPage()),
-                      // );
                       return NavigationActionPolicy.CANCEL;
                     }
                     return NavigationActionPolicy.ALLOW;
                   },
-                  onLoadError: (controllerr, url, code, message) async {
+                  onLoadError: (controller, url, code, message) async {
                     print('Error loading: $url, Error: $message');
                     getcontroller.handleloadingpage(isloadingpage: false);
                     getcontroller.handlenetworkpage(iserrorpage: true);

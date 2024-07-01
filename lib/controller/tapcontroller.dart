@@ -51,12 +51,20 @@ class GetxTapController extends GetxController {
 
   bool _iscomingfromnavbar = false;
   bool get iscomingfromnavbar => _iscomingfromnavbar;
+
+  String _username = '';
+  String get username => _username;
   @override
   Future<void> onInit() async {
     super.onInit();
     Future.delayed(const Duration(seconds: 2))
         .whenComplete(() => FlutterNativeSplash.remove());
     log('finish splash');
+  }
+
+  void setusername({required String name}) {
+    _username = name;
+    update();
   }
 
   void handleloadingpage({required bool isloadingpage}) {
@@ -132,7 +140,7 @@ class GetxTapController extends GetxController {
     final address =
         await getAddressFromLatLng(position.latitude, position.longitude);
     final gpsCoordinates =
-        'Lat: ${position.latitude}, Lon: ${position.longitude}';
+        'Lat: ${(position.latitude.toStringAsFixed(4))}, Lon: ${(position.longitude.toStringAsFixed(4))}';
 
     _capturedimages[index]['location'] = gpsCoordinates;
     update();
@@ -160,8 +168,14 @@ class GetxTapController extends GetxController {
         vetewidth: null);
     drawStringAtRightCorner(
         originalImage: originalImage,
-        address: 'MVU 1962',
+        address: _username,
         yposition: 260,
+        font: font,
+        vetewidth: vetex);
+    drawStringAtRightCorner(
+        originalImage: originalImage,
+        address: 'MVU 1962',
+        yposition: 340,
         font: font,
         vetewidth: vetex);
 
@@ -304,7 +318,7 @@ class GetxTapController extends GetxController {
         if (_selectedIndex == index) {
           webViewController?.loadUrl(
               urlRequest: URLRequest(
-                  url: WebUri('http://vetymanipur.in/MV/mv_task.aspx')));
+                  url: WebUri('https://vetymanipur.in/MV/mv_task.aspx')));
         }
       }
 
