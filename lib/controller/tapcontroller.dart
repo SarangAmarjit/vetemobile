@@ -1,27 +1,20 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'dart:math' as math;
+
 import 'package:auto_route/auto_route.dart';
-
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:image/image.dart' as img;
-import 'package:flutter_native_splash/flutter_native_splash.dart';
-
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:native_exif/native_exif.dart';
-import 'package:http/http.dart' as http;
-
 import 'package:get/get.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:native_exif/native_exif.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'package:permission_handler/permission_handler.dart';
 
 class GetxTapController extends GetxController {
@@ -278,6 +271,19 @@ class GetxTapController extends GetxController {
       y: y,
       font: font,
     );
+  }
+
+  void grandpermission() async {
+    // Request storage permissions if not already granted
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      final plugin = DeviceInfoPlugin();
+      final android = await plugin.androidInfo;
+      log('Android SDK Version :${android.version.sdkInt}');
+      status = android.version.sdkInt < 30
+          ? await Permission.storage.request()
+          : await Permission.manageExternalStorage.request();
+    }
   }
 
   Future saveImagesToGallery() async {

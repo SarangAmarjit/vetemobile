@@ -51,6 +51,7 @@ dependencies:
   url_launcher: ^6.3.0
 
   native_exif: ^0.6.0
+  flutter_downloader: ^1.11.8
 
 
 flutter_icons:

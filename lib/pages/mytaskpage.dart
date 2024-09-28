@@ -1,12 +1,15 @@
-import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
+
 import 'package:auto_route/auto_route.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:geotagcameraapp/controller/tapcontroller.dart';
-import 'package:geotagcameraapp/pages/networkerrorpage.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 @RoutePage()
@@ -51,6 +54,37 @@ class MytaskPage extends StatelessWidget {
                       'https://vetymanipur.in/MV/mv_task.aspx',
                     ),
                   ),
+                  onDownloadStartRequest: (controller, request) async {
+                    // Request storage permissions if not already granted
+                    var status = await Permission.storage.status;
+                    if (!status.isGranted) {
+                      final plugin = DeviceInfoPlugin();
+                      final android = await plugin.androidInfo;
+                      log('Android SDK Version :${android.version.sdkInt}');
+                      status = android.version.sdkInt < 30
+                          ? await Permission.storage.request()
+                          : await Permission.manageExternalStorage.request();
+                    }
+
+                    if (status.isGranted) {
+                      // Get app's document directory path
+                      Directory appDocDir =
+                          await getApplicationDocumentsDirectory();
+                      String savePath =
+                          "${appDocDir.path}/${request.suggestedFilename ?? "downloaded_file"}";
+
+                      // Start downloading
+                      await FlutterDownloader.enqueue(
+                        url: request.url.toString(),
+                        savedDir: appDocDir.path,
+                        fileName: request.suggestedFilename,
+                        showNotification: true,
+                        openFileFromNotification: true,
+                      );
+                    } else {
+                      log('Storage permission not granted');
+                    }
+                  },
                   onWebViewCreated: (controller) {
                     getcontroller.webViewController = controller;
                   },
@@ -82,6 +116,7 @@ class MytaskPage extends StatelessWidget {
                   shouldOverrideUrlLoading:
                       (controller, navigationAction) async {
                     var url = navigationAction.request.url.toString();
+                    log(url);
                     var uri = navigationAction.request.url;
                     if (uri != null && uri.scheme == "tel") {
                       await launch(uri.toString());
