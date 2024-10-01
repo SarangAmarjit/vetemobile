@@ -52,6 +52,8 @@ dependencies:
 
   native_exif: ^0.6.0
   flutter_downloader: ^1.11.8
+  excel: ^4.0.6
+
 
 
 flutter_icons:
